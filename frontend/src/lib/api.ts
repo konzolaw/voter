@@ -87,6 +87,18 @@ export const apiClient = {
     const response = await api.delete(`/voters/${voterId}/remove/`);
     return response.data;
   },
+
+  addCandidate: async (fullName: string) => {
+    const response = await api.post('/candidates/add/', {
+      full_name: fullName,
+    });
+    return response.data;
+  },
+
+  removeCandidate: async (candidateId: number) => {
+    const response = await api.delete(`/candidates/${candidateId}/remove/`);
+    return response.data;
+  },
 };
 
 export default api;

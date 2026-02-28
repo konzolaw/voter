@@ -20,11 +20,67 @@ class PositionViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [AllowAny]
 
 
-class CandidateViewSet(viewsets.ReadOnlyModelViewSet):
+class CandidateViewSet(viewsets.ModelViewSet):
     """API endpoint for candidates"""
     queryset = Candidate.objects.filter(eligible=True).prefetch_related('positions')
     serializer_class = CandidateSerializer
     permission_classes = [AllowAny]
+    
+    @action(detail=False, methods=['post'])
+    def add_candidate(self, request):
+        """Add a new candidate"""
+        full_name = request.data.get('full_name', '').strip()
+        
+        if not full_name:
+            return Response(
+                {'error': 'Full name is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Check if candidate already exists
+        if Candidate.objects.filter(full_name__iexact=full_name).exists():
+            return Response(
+                {'error': 'Candidate with this name already exists'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Create candidate eligible for all positions
+        candidate = Candidate.objects.create(
+            full_name=full_name,
+            eligible=True
+        )
+        candidate.positions.set(Position.objects.all())
+        
+        return Response(
+            CandidateSerializer(candidate).data,
+            status=status.HTTP_201_CREATED
+        )
+    
+    @action(detail=True, methods=['delete'])
+    def remove_candidate(self, request, pk=None):
+        """Remove a candidate"""
+        try:
+            candidate = Candidate.objects.get(pk=pk)
+            
+            # Check if candidate has received any votes
+            if Vote.objects.filter(candidate=candidate).exists():
+                return Response(
+                    {'error': 'Cannot delete candidate who has received votes'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            candidate_name = candidate.full_name
+            candidate.delete()
+            
+            return Response(
+                {'message': f'Candidate {candidate_name} removed successfully'},
+                status=status.HTTP_200_OK
+            )
+        except Candidate.DoesNotExist:
+            return Response(
+                {'error': 'Candidate not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
 
 class VoterViewSet(viewsets.ModelViewSet):
