@@ -136,15 +136,15 @@ export default function Ballot() {
             );
 
             return (
-              <div key={position.id} className="glass-effect-strong rounded-2xl p-6 md:p-8">
-                <div className="mb-6">
-                  <h2 className="text-2xl md:text-3xl font-bold mb-3 text-gold">
+              <div key={position.id} className="glass-effect-strong rounded-2xl p-4 md:p-6 lg:p-8">
+                <div className="mb-4 md:mb-6">
+                  <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-2 md:mb-3 text-gold">
                     {position.display_name}
                   </h2>
-                  <p className="text-gray-300 leading-relaxed">{position.description}</p>
+                  <p className="text-sm md:text-base text-gray-300 leading-relaxed">{position.description}</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                <div className="grid grid-cols-3 gap-3 md:gap-4 lg:gap-6">
                   {positionCandidates.map((candidate) => {
                     const isSelected = selections[position.id] === candidate.id;
 
@@ -152,11 +152,11 @@ export default function Ballot() {
                       <div
                         key={candidate.id}
                         onClick={() => handleSelectCandidate(position.id, candidate.id)}
-                        className={`glass-effect rounded-xl p-4 cursor-pointer card-hover ${
+                        className={`glass-effect rounded-lg md:rounded-xl p-2 md:p-4 cursor-pointer card-hover ${
                           isSelected ? 'selected-card' : ''
                         }`}
                       >
-                        <div className="aspect-square relative mb-3 rounded-lg overflow-hidden bg-gray-800">
+                        <div className="aspect-square relative mb-2 md:mb-3 rounded-lg overflow-hidden bg-gray-800">
                           <Image
                             src={candidate.image || '/rcc_placeholder.png'}
                             alt={candidate.full_name}
@@ -164,12 +164,12 @@ export default function Ballot() {
                             style={{ objectFit: 'cover' }}
                           />
                         </div>
-                        <h3 className="text-lg font-semibold text-center text-white">
+                        <h3 className="text-xs md:text-lg font-semibold text-center text-white">
                           {candidate.full_name}
                         </h3>
                         {isSelected && (
-                          <div className="mt-2 flex justify-center">
-                            <span className="text-xs bg-gold text-black px-3 py-1 rounded-full font-semibold">
+                          <div className="mt-1 md:mt-2 flex justify-center">
+                            <span className="text-[10px] md:text-xs bg-gold text-black px-2 md:px-3 py-0.5 md:py-1 rounded-full font-semibold">
                               Selected
                             </span>
                           </div>
