@@ -51,12 +51,13 @@ class Command(BaseCommand):
             else:
                 self.stdout.write(f'  Position already exists: {position}')
         
-        # All 25 voters
+        # All 26 voters
         voters_data = [
             "Konzolo", "Fortunate", "Teddy", "Mumbi", "Phinehas", "Mercy",
             "Terrence", "Trevor", "Ricardo", "Anitah", "Wesley", "Clinton",
             "Dad Ndichu", "Nancy", "Love", "Hope", "Brandon", "Enock",
-            "Judah", "Denno", "Vishal", "Aswani", "Allan", "Chris", "Panai"
+            "Judah", "Denno", "Vishal", "Aswani", "Allan", "Chris", "Panai",
+            "Dorcas"
         ]
         
         self.stdout.write('Creating voters...')
