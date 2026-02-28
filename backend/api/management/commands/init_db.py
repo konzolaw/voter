@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from api.models import Position, Voter, Candidate
+from api.models import Position, Voter, Candidate, SystemState
 
 
 class Command(BaseCommand):
@@ -7,6 +7,16 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         self.stdout.write('Starting database initialization...')
+        
+        # Reset voting state to open
+        self.stdout.write('Resetting voting state...')
+        state = SystemState.get_state()
+        state.voting_open = True
+        state.results_released = False
+        state.voting_closed_at = None
+        state.results_released_at = None
+        state.save()
+        self.stdout.write(self.style.SUCCESS('  Voting is now OPEN'))
         
         # Create positions
         positions_data = [
