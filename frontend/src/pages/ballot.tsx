@@ -144,7 +144,7 @@ export default function Ballot() {
                   <p className="text-gray-300 leading-relaxed">{position.description}</p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                   {positionCandidates.map((candidate) => {
                     const isSelected = selections[position.id] === candidate.id;
 
