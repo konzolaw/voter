@@ -1,0 +1,32 @@
+services:
+  # Django Backend API
+  - type: web
+    name: rcc-voting-backend
+    env: python
+    region: oregon
+    plan: free
+    branch: main
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn voting_system.wsgi:application"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DATABASE_URL
+        fromDatabase:
+          name: rcc-voting-db
+          property: connectionString
+      - key: ALLOWED_HOSTS
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+
+databases:
+  # PostgreSQL Database
+  - name: rcc-voting-db
+    plan: free
+    databaseName: rcc_voting
+    user: rcc_admin
