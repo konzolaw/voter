@@ -78,10 +78,11 @@ class Command(BaseCommand):
             else:
                 self.stdout.write(f'  Voter already exists: {voter.full_name}')
         
-        # 12 eligible candidates
+        # 13 eligible candidates
         candidates_data = [
             "Konzolo", "Fortunate", "Teddy", "Mumbi", "Phinehas", "Mercy",
-            "Terrence", "Trevor", "Ricardo", "Anitah", "Wesley", "Clinton"
+            "Terrence", "Trevor", "Ricardo", "Anitah", "Wesley", "Clinton",
+            "Dorcas"
         ]
         
         self.stdout.write('Creating candidates...')

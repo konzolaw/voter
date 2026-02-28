@@ -302,6 +302,47 @@ def close_voting(request):
 
 
 @api_view(['POST'])
+def restart_voting(request):
+    """Restart voting - deletes all votes and resets voter states (admin only)"""
+    try:
+        with transaction.atomic():
+            # Delete all votes
+            vote_count = Vote.objects.count()
+            Vote.objects.all().delete()
+            
+            # Delete all final results
+            FinalResult.objects.all().delete()
+            
+            # Reset all voters
+            voter_count = Voter.objects.filter(has_voted=True).count()
+            Voter.objects.update(
+                has_voted=False,
+                voted_at=None,
+                device_hash=None
+            )
+            
+            # Reset system state
+            state = SystemState.get_state()
+            state.voting_open = True
+            state.results_released = False
+            state.voting_closed_at = None
+            state.results_released_at = None
+            state.save()
+            
+            return Response({
+                'success': True,
+                'message': 'Voting system has been restarted',
+                'votes_deleted': vote_count,
+                'voters_reset': voter_count
+            })
+    except Exception as e:
+        return Response(
+            {'error': f'Failed to restart voting: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['POST'])
 def release_results(request):
     """Release results with conflict resolution (admin only)"""
     state = SystemState.get_state()

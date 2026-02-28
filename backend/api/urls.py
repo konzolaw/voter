@@ -15,6 +15,7 @@ urlpatterns = [
     path('submit-votes/', views.submit_votes, name='submit-votes'),
     path('system-state/', views.system_state, name='system-state'),
     path('close-voting/', views.close_voting, name='close-voting'),
+    path('restart-voting/', views.restart_voting, name='restart-voting'),
     path('release-results/', views.release_results, name='release-results'),
     path('results/', views.get_results, name='results'),
     path('stats/', views.voting_stats, name='stats'),

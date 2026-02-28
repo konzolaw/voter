@@ -60,6 +60,45 @@ export default function ControlPage() {
     }
   };
 
+  const handleRestartVoting = async () => {
+    const confirmed = confirm(
+      '⚠️ DANGER: This will DELETE ALL VOTES and RESET ALL VOTERS!\n\n' +
+      'This action is useful if errors occurred during testing.\n\n' +
+      '• All votes will be permanently deleted\n' +
+      '• All voters will be reset to "not voted"\n' +
+      '• Voting will be reopened\n' +
+      '• Results will be cleared\n\n' +
+      'Are you absolutely sure you want to continue?'
+    );
+
+    if (!confirmed) return;
+
+    const doubleConfirm = confirm('Final confirmation: Type YES in the next prompt to proceed');
+    if (!doubleConfirm) return;
+
+    const userInput = prompt('Type YES to confirm restart:');
+    if (userInput !== 'YES') {
+      alert('Restart cancelled - confirmation text did not match');
+      return;
+    }
+
+    setActionInProgress(true);
+    try {
+      const response = await apiClient.restartVoting();
+      await loadState();
+      alert(
+        `✅ Voting system restarted successfully!\n\n` +
+        `Votes deleted: ${response.votes_deleted}\n` +
+        `Voters reset: ${response.voters_reset}\n\n` +
+        `Voting is now OPEN again.`
+      );
+    } catch (err: any) {
+      alert(err.response?.data?.error || 'Failed to restart voting');
+    } finally {
+      setActionInProgress(false);
+    }
+  };
+
   if (loading) {
     return (
       <AdminLayout title="Control Panel">
@@ -185,6 +224,43 @@ export default function ControlPage() {
           >
             View Public Results
           </button>
+        </div>
+
+        {/* DANGER ZONE - Restart Voting */}
+        <div className="glass-effect-strong rounded-2xl p-6 border-2 border-red-600/50 bg-red-900/10">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <h3 className="text-xl font-semibold mb-2 text-red-400 flex items-center gap-2">
+                <span>⚠️</span>
+                <span>DANGER ZONE: Restart Voting</span>
+              </h3>
+              <p className="text-gray-300 mb-4">
+                Use this button if errors occurred during testing or if you need to completely reset the voting system.
+              </p>
+              <div className="bg-red-950/50 border border-red-800 rounded-lg p-4 mb-4">
+                <p className="text-red-300 font-semibold mb-2">This will:</p>
+                <ul className="text-sm text-red-200 space-y-1">
+                  <li>• <strong>DELETE ALL VOTES</strong> permanently</li>
+                  <li>• Reset all voters to "not voted" status</li>
+                  <li>• Clear all results</li>
+                  <li>• Reopen voting</li>
+                  <li>• Clear device hashes</li>
+                </ul>
+              </div>
+              <p className="text-yellow-400 text-sm font-semibold">
+                ⚠️ This action requires multiple confirmations and cannot be undone!
+              </p>
+            </div>
+            <div className="ml-6">
+              <button
+                onClick={handleRestartVoting}
+                disabled={actionInProgress}
+                className="bg-gradient-to-r from-red-700 to-red-800 hover:from-red-800 hover:to-red-900 text-white font-bold py-4 px-8 rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none min-w-[200px] shadow-lg shadow-red-900/50 border-2 border-red-500"
+              >
+                {actionInProgress ? 'Processing...' : '🔄 Restart Voting'}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </AdminLayout>

@@ -56,6 +56,11 @@ export const apiClient = {
     return response.data;
   },
 
+  restartVoting: async () => {
+    const response = await api.post('/restart-voting/');
+    return response.data;
+  },
+
   releaseResults: async () => {
     const response = await api.post('/release-results/');
     return response.data;
