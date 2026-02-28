@@ -65,6 +65,23 @@ export const apiClient = {
     const response = await api.get('/stats/');
     return response.data;
   },
+
+  getVoters: async () => {
+    const response = await api.get('/voters/');
+    return response.data;
+  },
+
+  addVoter: async (fullName: string) => {
+    const response = await api.post('/voters/add/', {
+      full_name: fullName,
+    });
+    return response.data;
+  },
+
+  removeVoter: async (voterId: number) => {
+    const response = await api.delete(`/voters/${voterId}/remove/`);
+    return response.data;
+  },
 };
 
 export default api;

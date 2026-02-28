@@ -27,11 +27,70 @@ class CandidateViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [AllowAny]
 
 
-class VoterViewSet(viewsets.ReadOnlyModelViewSet):
+class VoterViewSet(viewsets.ModelViewSet):
     """API endpoint for voters (admin only for listing)"""
     queryset = Voter.objects.all()
     serializer_class = VoterSerializer
     permission_classes = [AllowAny]
+    
+    @action(detail=False, methods=['post'])
+    def add_voter(self, request):
+        """Add a new voter"""
+        full_name = request.data.get('full_name', '').strip()
+        
+        if not full_name:
+            return Response(
+                {'error': 'Full name is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Check if voter already exists
+        if Voter.objects.filter(full_name__iexact=full_name).exists():
+            return Response(
+                {'error': 'Voter with this name already exists'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Extract first name
+        first_name = full_name.split()[0].strip().capitalize()
+        
+        voter = Voter.objects.create(
+            full_name=full_name,
+            first_name=first_name,
+            allowed=True,
+            has_voted=False
+        )
+        
+        return Response(
+            VoterSerializer(voter).data,
+            status=status.HTTP_201_CREATED
+        )
+    
+    @action(detail=True, methods=['delete'])
+    def remove_voter(self, request, pk=None):
+        """Remove a voter"""
+        try:
+            voter = Voter.objects.get(pk=pk)
+            
+            # Don't allow deleting if they've already voted
+            if voter.has_voted:
+                return Response(
+                    {'error': 'Cannot delete voter who has already voted'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            voter_name = voter.full_name
+            voter.delete()
+            
+            return Response(
+                {'message': f'Voter {voter_name} removed successfully'},
+                status=status.HTTP_200_OK
+            )
+        except Voter.DoesNotExist:
+            return Response(
+                {'error': 'Voter not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
     
     @action(detail=False, methods=['post'])
     def verify_voter(self, request):
