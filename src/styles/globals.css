@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html,
+  body {
+    background-color: #08090D;
+    color: #F8FAFC;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+}
+
+/* Ambient Apple-grade background lighting */
+.ambient-bg {
+  background: 
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(229, 192, 123, 0.12), transparent),
+    radial-gradient(ellipse 60% 40% at 50% 120%, rgba(15, 23, 42, 0.6), transparent),
+    #08090D;
+}
+
+/* Apple-style Frosted Glass Panels */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+.glass-pill {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* Tactile button press */
+.tap-effect {
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.15s ease;
+}
+.tap-effect:active {
+  transform: scale(0.98);
+  opacity: 0.92;
+}
+
+/* Refined champagne accent glow */
+.gold-glow {
+  box-shadow: 0 0 24px rgba(229, 192, 123, 0.22);
+}
+
+/* Podium Announcement Animations */
+@keyframes podiumReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(35px) scale(0.93);
+    filter: blur(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.podium-card-animate {
+  opacity: 0;
+  animation: podiumReveal 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes crownPulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 8px rgba(229, 192, 123, 0.5));
+  }
+  50% {
+    transform: scale(1.12);
+    filter: drop-shadow(0 0 16px rgba(229, 192, 123, 0.9));
+  }
+}
+
+.crown-pulse {
+  animation: crownPulse 2.8s ease-in-out infinite;
+}
+
+@keyframes shimmerPass {
+  0% {
+    transform: translateX(-100%) rotate(25deg);
+  }
+  100% {
+    transform: translateX(200%) rotate(25deg);
+  }
+}
+
+.shimmer-effect {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 100%
+  );
+  animation: shimmerPass 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  pointer-events: none;
+}
+
