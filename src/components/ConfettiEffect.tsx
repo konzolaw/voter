@@ -11,6 +11,7 @@ interface Particle {
   angle: number;
   angularVelocity: number;
   opacity: number;
+  createdAt: number;
 }
 
 export default function ConfettiEffect() {
@@ -33,78 +34,104 @@ export default function ConfettiEffect() {
     };
     window.addEventListener('resize', handleResize);
 
-    // Luxury palette: Metallic Gold, Bright Champagne, Platinum White, Emerald Accent
+    // Luxury palette: Metallic Gold, Bright Champagne, Sunlight Gold, Brilliant White, Emerald Accent
     const colors = [
       '#E5C07B', // Gold
       '#F3D99E', // Bright Champagne
       '#FFE8A3', // Sunlight Gold
-      '#FFFFFF', // Brilliant Diamond White
-      '#10B981', // Emerald Victory Accent
+      '#FFFFFF', // Diamond White
+      '#10B981', // Emerald Victory
       '#34D399', // Mint Accent
       '#F59E0B', // Amber
     ];
 
-    const particleCount = 140;
     const particles: Particle[] = [];
 
-    for (let i = 0; i < particleCount; i++) {
-      // Launch from top quadrants with parabolic spread
-      const fromLeft = Math.random() < 0.5;
-      particles.push({
-        x: fromLeft ? width * 0.15 + Math.random() * (width * 0.2) : width * 0.65 + Math.random() * (width * 0.2),
-        y: -20 - Math.random() * 80,
-        w: 6 + Math.random() * 8,
-        h: 4 + Math.random() * 6,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        vx: (Math.random() - 0.5) * 8 + (fromLeft ? 3 : -3),
-        vy: 2 + Math.random() * 5,
-        angle: Math.random() * Math.PI * 2,
-        angularVelocity: (Math.random() - 0.5) * 0.2,
-        opacity: 1,
-      });
-    }
+    // Helper to fire a single celebratory cannon burst
+    const spawnCannonBurst = () => {
+      const burstSize = 120;
+      const now = performance.now();
+      for (let i = 0; i < burstSize; i++) {
+        const fromLeft = Math.random() < 0.5;
+        particles.push({
+          x: fromLeft
+            ? width * 0.08 + Math.random() * (width * 0.3)
+            : width * 0.62 + Math.random() * (width * 0.3),
+          y: -15 - Math.random() * 60,
+          w: 6 + Math.random() * 7,
+          h: 4 + Math.random() * 6,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          vx: (Math.random() - 0.5) * 8 + (fromLeft ? 3.5 : -3.5),
+          vy: 2.2 + Math.random() * 5.2,
+          angle: Math.random() * Math.PI * 2,
+          angularVelocity: (Math.random() - 0.5) * 0.22,
+          opacity: 1,
+          createdAt: now,
+        });
+      }
+    };
+
+    // Burst 1: Immediately at 0s
+    spawnCannonBurst();
+
+    // Burst 2: After 5 seconds
+    const timer1 = setTimeout(() => {
+      spawnCannonBurst();
+    }, 5000);
+
+    // Burst 3: After 10 seconds (5s after burst 2)
+    const timer2 = setTimeout(() => {
+      spawnCannonBurst();
+    }, 10000);
 
     let animationFrameId: number;
-    let startTime = performance.now();
-    const totalDuration = 6000; // 6 seconds celebration
+    const particleLifetime = 4500; // each particle lives for 4.5s
+    const totalDuration = 10000 + particleLifetime; // finishes ~14.5s
+
+    const startTime = performance.now();
 
     const render = (now: number) => {
       const elapsed = now - startTime;
       ctx.clearRect(0, 0, width, height);
 
-      let activeParticles = 0;
+      let activeCount = 0;
 
-      for (let i = 0; i < particles.length; i++) {
+      for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
+        const age = now - p.createdAt;
 
         // Apply physics
         p.x += p.vx;
         p.y += p.vy;
-        p.vy += 0.08; // subtle gravity
-        p.vx *= 0.99; // air resistance
+        p.vy += 0.08; // gravity
+        p.vx *= 0.99; // drag
         p.angle += p.angularVelocity;
 
-        // Fade out gracefully near the end
-        if (elapsed > totalDuration * 0.6) {
-          p.opacity = Math.max(0, 1 - (elapsed - totalDuration * 0.6) / (totalDuration * 0.4));
+        // Graceful fade out in the last 1.5 seconds of particle life
+        if (age > particleLifetime - 1500) {
+          p.opacity = Math.max(0, (particleLifetime - age) / 1500);
         }
 
-        if (p.y < height + 50 && p.opacity > 0) {
-          activeParticles++;
-
-          ctx.save();
-          ctx.globalAlpha = p.opacity;
-          ctx.translate(p.x, p.y);
-          ctx.rotate(p.angle);
-          ctx.fillStyle = p.color;
-          ctx.shadowColor = p.color;
-          ctx.shadowBlur = 6;
-          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
-          ctx.restore();
+        if (p.opacity <= 0 || p.y > height + 80) {
+          // Remove dead particle
+          particles.splice(i, 1);
+          continue;
         }
+
+        activeCount++;
+
+        ctx.save();
+        ctx.globalAlpha = p.opacity;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.angle);
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 6;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
       }
 
-      if (activeParticles > 0 && elapsed < totalDuration) {
+      if (elapsed < totalDuration || activeCount > 0) {
         animationFrameId = requestAnimationFrame(render);
       } else {
         ctx.clearRect(0, 0, width, height);
@@ -114,6 +141,8 @@ export default function ConfettiEffect() {
     animationFrameId = requestAnimationFrame(render);
 
     return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animationFrameId);
     };

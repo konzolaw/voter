@@ -45,7 +45,6 @@ export default function Results() {
   const [released, setReleased] = useState(() => cachedResults?.released || false);
   const [results, setResults] = useState<FinalResult[]>(() => cachedResults?.results || []);
   const [message, setMessage] = useState(() => cachedResults?.message || '');
-  const [confettiKey, setConfettiKey] = useState(0);
 
   useEffect(() => {
     loadResults();
@@ -70,9 +69,6 @@ export default function Results() {
     }
   };
 
-  const handleCelebrateAgain = () => {
-    setConfettiKey((prev) => prev + 1);
-  };
 
   if (loading) {
     return (
@@ -147,21 +143,12 @@ export default function Results() {
 
   return (
     <div className="min-h-screen ambient-bg flex flex-col justify-between py-6 px-4 sm:px-6 relative overflow-x-hidden">
-      {/* Dynamic Victory Confetti Cannon Explosion */}
-      <ConfettiEffect key={confettiKey} />
+      {/* Dynamic Victory Confetti Cannon: fires 3 times, every 5 seconds */}
+      <ConfettiEffect />
 
       <main className="max-w-5xl w-full mx-auto pb-16 relative z-10">
-        {/* Top Header - Pure Naked Typography with Victory Badge */}
+        {/* Top Header - Pure Naked Typography */}
         <div className="text-center pt-2 sm:pt-4 mb-8 sm:mb-12">
-          {/* Celebratory Official Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-4 animate-fade-in shadow-lg shadow-emerald-950/40">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            <span>Official Declaration &bull; Certified Returns</span>
-          </div>
-
           <h1 className="font-syne font-black text-3xl sm:text-6xl uppercase tracking-tight text-white leading-none">
             CERTIFIED RESULTS
           </h1>
@@ -257,17 +244,7 @@ export default function Results() {
         </div>
 
         {/* Action Controls */}
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-4 text-center">
-          <button
-            onClick={handleCelebrateAgain}
-            className="tap-effect inline-flex items-center gap-2 px-6 h-12 rounded-xl bg-gradient-to-r from-gold/20 via-gold/30 to-gold/20 hover:from-gold/30 hover:to-gold/40 text-gold font-bold text-xs uppercase tracking-wider border border-gold/40 transition-all cursor-pointer shadow-lg shadow-gold/10"
-          >
-            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-              <path d="M12 2l2.4 7.4h7.6l-6.2 4.5 2.4 7.4-6.2-4.5-6.2 4.5 2.4-7.4-6.2-4.5h7.6z" />
-            </svg>
-            <span>Trigger Victory Cannon</span>
-          </button>
-
+        <div className="mt-12 text-center">
           <button
             onClick={() => router.push('/')}
             className="tap-effect inline-flex items-center gap-2 px-8 h-12 rounded-xl bg-white/5 hover:bg-white/10 text-white font-medium text-sm transition-all border border-white/10 cursor-pointer"
@@ -279,6 +256,7 @@ export default function Results() {
           </button>
         </div>
       </main>
+
 
       {/* Minimalist Footer */}
       <footer className="w-full max-w-5xl mx-auto pt-8 pb-2 text-center relative z-10">
